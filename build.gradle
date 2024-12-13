@@ -56,7 +56,7 @@ dependencies {
 	implementation "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:api"
 	//implementation "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:dev"
 
-	implementation "maven.modrinth:watermedia:2.1.7"
+	implementation "maven.modrinth:watermedia:2.1.8"
 	implementation "net.java.dev.jna:jna:5.10.0"
 	implementation "net.java.dev.jna:jna-platform:5.10.0"
 

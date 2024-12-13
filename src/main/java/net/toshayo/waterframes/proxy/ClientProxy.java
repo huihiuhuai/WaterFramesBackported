@@ -28,11 +28,17 @@ import net.toshayo.waterframes.network.packets.MutePacket;
 import net.toshayo.waterframes.network.packets.PausePacket;
 import net.toshayo.waterframes.network.packets.RequestDisplayInfoPacket;
 import net.toshayo.waterframes.tileentities.*;
+import org.watermedia.videolan4j.tools.Version;
 
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent event) throws Exception {
         super.preInit(event);
+
+        final Version minVersion = new Version("2.1.8");
+        if(!new Version(WaterMedia.VERSION).atLeast(minVersion)) {
+            throw new RuntimeException("WaterMedia " + WaterMedia.VERSION + " is too old, please update the mod");
+        }
         WaterMedia.prepare(ILoader.DEFAULT).start();
     }
 
