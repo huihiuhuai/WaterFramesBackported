@@ -1,0 +1,10 @@
+[
+	{
+		"modid": "${mod_id}",
+		"name": "WaterFrames",
+		"description": "TV in Minecraft!",
+		"version":"${version}",
+		"mcversion": "1.7.10",
+		"credits": "${credits}"
+	}
+]

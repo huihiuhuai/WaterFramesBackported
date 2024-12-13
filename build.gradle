@@ -1,0 +1,133 @@
+buildscript {
+	repositories {
+		maven { url = 'https://maven.minecraftforge.net/' }
+		maven { url = 'https://plugins.gradle.org/m2' }
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.1.1') {
+			changing = true
+		}
+
+		//classpath 'com.github.johnrengelman:shadow:8.1.1'
+	}
+}
+
+//apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'forge'
+
+version = mod_version
+
+compileJava.options.encoding = 'UTF-8'
+java.sourceCompatibility = java.targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+minecraft {
+	version = "1.7.10-10.13.4.1614-1.7.10"
+
+	replace "@@VERSION@@", project.version
+	if(project.gradle.startParameter.taskNames.size() > 0 && project.gradle.startParameter.taskNames.first().startsWith("run"))
+		replace "@@ENVIRONMENT@@", "deobf"
+	else
+		replace "@@ENVIRONMENT@@", "obf"
+
+	runDir = "run"
+}
+
+repositories {
+	maven {
+		name = 'ModMaven'
+		url = 'https://modmaven.dev'
+	}
+	maven {
+		url = "https://api.modrinth.com/maven"
+	}
+	flatDir {
+		dir 'libs/'
+	}
+}
+
+configurations {
+	shade
+}
+
+dependencies {
+	//compileOnly "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:api"
+	implementation "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:api"
+	//implementation "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:dev"
+
+	implementation "maven.modrinth:watermedia:2.1.7"
+	implementation "net.java.dev.jna:jna:5.10.0"
+	implementation "net.java.dev.jna:jna-platform:5.10.0"
+
+}
+
+/*shadowJar {
+	configurations = [project.configurations.shade]
+	exclude '*.html'
+	archiveClassifier.set('') // Replace the default JAR
+}
+
+reobf {
+	dependsOn shadowJar // Reobfuscate the shadowed JAR
+}*/
+
+processResources {
+	inputs.property "version", mod_version
+	inputs.property "credits", credits
+
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+		
+		// replace version and mcversion
+		expand (
+				mod_id: mod_id,
+				version: mod_version,
+				credits: credits
+		)
+	}
+
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+jar {
+	manifest {
+		attributes([
+				"Implementation-Title"    : project.name,
+				"Implementation-Version"  : project.version,
+				"FMLCorePluginContainsFMLMod": "true",
+				"FMLCorePlugin": "net.toshayo.waterframes.WaterFramesPlugin",
+				"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+				"FMLAT": "waterframes_at.cfg"
+		])
+	}
+}
+
+build {
+	doLast {
+		if(project.hasProperty("TOSHAYO_JKS")) {
+			println "Using Project properties for jar signing."
+			def jks_file = TOSHAYO_JKS
+			def passwd = TOSHAYO_PWD
+			if (jks_file != null && passwd != null) {
+				//noinspection HttpUrlsUsage
+				def exec_line = [
+						"jarsigner",
+						"-sigalg", "SHA256withECDSA",
+						"-digestalg", "SHA-256",
+						"-keystore", jks_file,
+						"-storepass", passwd,
+						"-tsa", "http://timestamp.digicert.com",
+						jar.archiveFile.get(), TOSHAYO_APP_ALIAS
+				].execute()
+				exec_line.waitFor()
+				if(exec_line.exitValue() != 0) {
+					throw new RuntimeException("Signing failed!")
+				}
+			}
+		} else {
+			println 'No signing secrets found, build will not be signed.'
+		}
+	}
+}
