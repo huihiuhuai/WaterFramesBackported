@@ -17,7 +17,7 @@ public class ImageFetchCachingDisablingVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String methodName, String desc, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = cv.visitMethod(access, methodName, desc, signature, exceptions);
-        if (methodName.equals("load") && desc.equals("(Ljava/lang/String;Ljava/net/URL;)[B")) {
+        if (methodName.equals("openConnection") && desc.equals("(Ljava/net/URI;Lorg/watermedia/api/cache/CacheAPI$Entry;)Ljava/net/URLConnection;")) {
             return new MethodVisitor(Opcodes.ASM5, methodVisitor) {
                 @Override
                 public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
