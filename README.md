@@ -23,5 +23,9 @@ A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github
 
 - The mod uses WATERMeDIA that was developped for 1.21.1. That means some features might be broken.
 - Redstone control is not supported yet.
+- Other features might not be ported from WATERFrAMES.
 
-If you are experiencing crashes, feel free to open issues I'll fix when I have time.
+If you are experiencing crashes, feel free to open issues [here](https://github.com/Toshayo/WaterFrames/issues) I'll fix when I have time.
+
+**Please don't report issues directly to WATERMeDIA or original WATERFrAMES mod!**
+
