@@ -4,11 +4,8 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.relauncher.Side;
-import org.watermedia.WaterMedia;
-import org.watermedia.loaders.ILoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -28,20 +25,8 @@ import net.toshayo.waterframes.network.packets.MutePacket;
 import net.toshayo.waterframes.network.packets.PausePacket;
 import net.toshayo.waterframes.network.packets.RequestDisplayInfoPacket;
 import net.toshayo.waterframes.tileentities.*;
-import org.watermedia.videolan4j.tools.Version;
 
 public class ClientProxy extends CommonProxy {
-    @Override
-    public void preInit(FMLPreInitializationEvent event) throws Exception {
-        super.preInit(event);
-
-        final Version minVersion = new Version("2.1.8");
-        if(!new Version(WaterMedia.VERSION).atLeast(minVersion)) {
-            throw new RuntimeException("WaterMedia " + WaterMedia.VERSION + " is too old, please update the mod");
-        }
-        WaterMedia.prepare(ILoader.DEFAULT).start();
-    }
-
     @Override
     public void onInit(FMLInitializationEvent event) {
         DisplayControl displayControl = new DisplayControl();
