@@ -11,7 +11,7 @@ import java.util.Map;
         "net.toshayo.waterframes"
 })
 public class WaterFramesPlugin implements IFMLLoadingPlugin {
-    public static final Logger LOGGER = LogManager.getLogger("WaterFramesPlugin");
+    public static final Logger LOGGER = LogManager.getLogger("WaterFramesBackportedPlugin");
 
     @Override
     public String[] getASMTransformerClass() {

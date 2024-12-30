@@ -1,4 +1,4 @@
-## WaterFrames
+## WaterFramesBackported
 
 A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github.com/SrRapero720/waterframes](https://github.com/SrRapero720/waterframes))
 
@@ -10,7 +10,7 @@ A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github
 - JNA
 
     You will need jna and jna-platform libraries (5.10.0 for example). If you have a recent minecraft installation
-    you can find these in some libraries folder. (These might probably be included in mod jar in newer version of the mod)
+    you can find these in some libraries' folder. (These might probably be included in mod jar in newer version of the mod)
     
     It should be installed in ``mods`` folder like any other mod (though the game will probably warn you that it's not a mod)
 
@@ -23,7 +23,7 @@ A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github
 
 ### More info about the 1.7.10 port
 
-- The mod uses WATERMeDIA that was developped for 1.21.1. That means some features might be broken.
+- The mod uses WATERMeDIA that was developed for 1.21.1. That means some features might be broken.
 - Redstone control is not supported yet.
 - Other features might not be ported from WATERFrAMES.
 

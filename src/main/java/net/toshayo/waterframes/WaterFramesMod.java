@@ -21,7 +21,7 @@ import java.net.URI;
 )
 public class WaterFramesMod {
     public static final String MOD_ID = "waterframes";
-    public static final String NAME = "WaterFrames";
+    public static final String NAME = "WaterFramesBackported";
     public static final String VERSION = "@@VERSION@@";
     private static final String ENVIRONMENT_NAME = "@@ENVIRONMENT@@";
 

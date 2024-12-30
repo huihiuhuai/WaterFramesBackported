@@ -18,6 +18,8 @@ buildscript {
 apply plugin: 'forge'
 
 version = mod_version
+group = modGroup
+archivesBaseName = modArchivesBaseName
 
 compileJava.options.encoding = 'UTF-8'
 java.sourceCompatibility = java.targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -94,7 +96,7 @@ processResources {
 jar {
 	manifest {
 		attributes([
-				"Implementation-Title"    : project.name,
+				"Implementation-Title"    : archiveBaseName,
 				"Implementation-Version"  : project.version,
 				"FMLCorePluginContainsFMLMod": "true",
 				"FMLCorePlugin": "net.toshayo.waterframes.WaterFramesPlugin",
