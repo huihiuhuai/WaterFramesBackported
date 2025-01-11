@@ -4,7 +4,7 @@ A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github
 
 ### Dependencies
 
-- [WATERMeDIA](https://wwww.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
+- [WATERMeDIA](https://www.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
 
     Take version 2.1.8, and it does not matter that the mod is for 1.21.1
 - JNA
