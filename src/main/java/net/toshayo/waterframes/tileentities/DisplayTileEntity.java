@@ -112,6 +112,7 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
         this.readFromNBT(pkt.func_148857_g());
+        markDirty();// TODO: Test if it is the source of the unloading/loading issue
     }
 
     @Override
