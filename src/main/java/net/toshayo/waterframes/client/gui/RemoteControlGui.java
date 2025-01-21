@@ -86,7 +86,9 @@ public class RemoteControlGui extends GuiScreen {
         widgets.add(new IconButton(
                 this, IconStyles.RELOAD,
                 x + WIDTH / 2 - 10, (int)(y + 10 + fontRendererObj.FONT_HEIGHT * 6.5), 20, 20,
-                button -> {}
+                button -> {
+                    if(tile.imageCache != null) tile.imageCache.reload();
+                }
         ));
 
         widgets.add(new IconButton(
