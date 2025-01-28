@@ -1,10 +1,9 @@
 package net.toshayo.waterframes.tileentities;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import org.watermedia.api.image.ImageAPI;
-import org.watermedia.api.image.ImageCache;
-import org.watermedia.api.math.MathAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -21,12 +20,17 @@ import net.toshayo.waterframes.blocks.DisplayBlock;
 import net.toshayo.waterframes.client.TextureDisplay;
 import net.toshayo.waterframes.network.PacketDispatcher;
 import net.toshayo.waterframes.network.packets.*;
+import org.watermedia.api.image.ImageAPI;
+import org.watermedia.api.image.ImageCache;
+import org.watermedia.api.math.MathAPI;
 import toshayopack.team.creative.creativecore.common.util.math.AlignedBox;
 import toshayopack.team.creative.creativecore.common.util.math.Axis;
 import toshayopack.team.creative.creativecore.common.util.math.Facing;
 
 //@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")
 public abstract class DisplayTileEntity extends TileEntity /*implements SimpleComponent*/ {
+    private static int lagTickTime;
+
     public final DisplayData data;
     public final DisplayCaps caps;
 
@@ -49,6 +53,30 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
         blockFacing = EnumFacing.DOWN;
         isLit = false;
         isVisible = true;
+    }
+
+    public static void setLagTickTime(long ltt) {
+        if (ltt < 60000) {
+            lagTickTime = (int) (ltt / 50);
+        } else {
+            WaterFramesMod.LOGGER.warn("Rejected tick correction of {}ms, overpass watchdog time", ltt);
+        }
+    }
+
+    public static void clearLagTickTime() {
+        lagTickTime = 0;
+    }
+
+    @SubscribeEvent
+    public static void onTickLast(TickEvent.ServerTickEvent e) {
+        if (e.phase == TickEvent.Phase.END) {
+            clearLagTickTime();
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public TextureDisplay activeDisplay() {
+        return display;
     }
 
     public boolean isLit() {
@@ -76,7 +104,6 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
             this.imageCache = ImageAPI.getCache(this.data.uri, Minecraft.getMinecraft()::func_152344_a);
             this.cleanDisplay();
         }
-
         switch (imageCache.getStatus()) {
             case LOADING:
             case FAILED:
@@ -112,7 +139,7 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
         this.readFromNBT(pkt.func_148857_g());
-        markDirty();// TODO: Test if it is the source of the unloading/loading issue
+        markDirty();
     }
 
     @Override
@@ -161,7 +188,7 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
     }
 
     @Override
-    public void invalidate() {
+    public void invalidate() { // setRemoved
         if (this.isClient()) {
             this.release();
         }
@@ -218,17 +245,29 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
 
     @Override
     public void updateEntity() {
-        if (this.data.tickMax == -1 || this.data.tick < 0) this.data.tick = 0;
+        if (this.data.tickMax == -1 || this.data.tick < 0) {
+            this.data.tick = 0;
+        }
 
         if (!this.data.paused && this.data.active) {
             if (this.data.tick < this.data.tickMax) {
                 this.data.tick++;
+                if (lagTickTime != 0 && this.isServer()) {
+                    int ticks = this.data.tick + lagTickTime;
+                    while (ticks > this.data.tickMax) {
+                        ticks -= this.data.tickMax;
+                    }
+                    this.data.tick = ticks;
+                    this.markDirty();
+                }
             } else {
-                if (this.data.loop || this.data.tickMax == -1) this.data.tick = 0;
+                if (this.data.loop || this.data.tickMax == -1) {
+                    this.data.tick = 0;
+                }
             }
         }
 
-        boolean updateBlock = false;
+        boolean updateBlock = false; // refresh
         int redstoneOutput = 0;
 
         if (this.data.tickMax > 0 && this.data.active) {
@@ -265,6 +304,10 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
         return this.worldObj != null && this.worldObj.isRemote;
     }
 
+    public boolean isServer() {
+        return this.worldObj != null && !this.worldObj.isRemote;
+    }
+
     public boolean canHideModel() {
         return ((DisplayBlock) getBlockType()).canHideModel();
     }
@@ -285,7 +328,7 @@ public abstract class DisplayTileEntity extends TileEntity /*implements SimpleCo
             worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
             worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
         } else {
-            WaterFramesMod.LOGGER.warn("Cannot be stored block data, level is NULL");
+            WaterFramesMod.LOGGER.warn("Cannot be stored block data, world is NULL");
         }
     }
 

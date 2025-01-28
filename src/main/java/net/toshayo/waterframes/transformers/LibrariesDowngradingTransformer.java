@@ -21,6 +21,7 @@ public class LibrariesDowngradingTransformer implements IClassTransformer {
             byte[] resultingClass = visitClass(basicClass, classWriter -> new Log4JDowngradingVisitor(transformedName, classWriter));
             if (transformedName.equals("org.watermedia.api.image.ImageFetch")) {
                 resultingClass = visitClass(resultingClass, classWriter -> new ImageFetchCachingDisablingVisitor(transformedName, classWriter));
+                resultingClass = visitClass(resultingClass, classWriter -> new ImageFetchMimeGuessingVisitor(transformedName, classWriter));
             }
             return resultingClass;
         }

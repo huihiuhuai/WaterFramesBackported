@@ -15,7 +15,7 @@ public class Vec3f extends VecNf<Vec3f> {
     }
 
     public Vec3f(Vec3f vec) {
-        super(vec);
+        this(vec.x, vec.y, vec.z);
     }
 
     /*public Vec3f(Vector3f vec) {

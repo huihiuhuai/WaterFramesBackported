@@ -80,6 +80,10 @@ public class DisplayData {
     public float projectionDistance = WFConfig.maxProjDis(8f);
     public float audioOffset = 0;
 
+    public boolean isUriInvalid() {
+        return this.uri == null;
+    }
+
     public PositionHorizontal getPosX() {
         return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER;
     }
@@ -382,8 +386,9 @@ public class DisplayData {
             tile.data.volume = WFConfig.maxVol(nbt.getInteger(VOLUME));
             tile.data.maxVolumeDistance = WFConfig.maxVolDis(nbt.getInteger(VOL_RANGE_MAX));
             tile.data.minVolumeDistance = Math.min(nbt.getInteger(VOL_RANGE_MIN), tile.data.maxVolumeDistance);
-            if (tile.data.minVolumeDistance > tile.data.maxVolumeDistance)
+            if (tile.data.minVolumeDistance > tile.data.maxVolumeDistance) {
                 tile.data.maxVolumeDistance = tile.data.minVolumeDistance;
+            }
 
             if (tile.canHideModel()) {
                 tile.setVisibility(nbt.getBoolean("visible"));
@@ -402,9 +407,5 @@ public class DisplayData {
         }
 
         tile.markDirty();
-    }
-
-    public boolean isUriInvalid() {
-        return this.uri == null;
     }
 }

@@ -1,7 +1,10 @@
 package net.toshayo.waterframes;
 
+import net.toshayo.waterframes.utils.ExtensionsMimeTypes;
+import org.apache.commons.io.FilenameUtils;
 import org.lwjgl.BufferUtils;
 
+import java.net.URI;
 import java.nio.ByteBuffer;
 
 public class PluginUtils {
@@ -52,5 +55,16 @@ public class PluginUtils {
 
     public static void MemoryAlloc_free(ByteBuffer pBuffer) {
         pBuffer = null;
+    }
+
+    public static String ImageFetch_getContentType(String type, URI uri) {
+        if(type.equals("content/unknown")) {
+            return getMimeByExtension(FilenameUtils.getExtension(uri.getPath()));
+        }
+        return type;
+    }
+
+    private static String getMimeByExtension(String extension) {
+        return ExtensionsMimeTypes.MIME_BY_EXTENSION.getOrDefault(extension, "content/unknown");
     }
 }

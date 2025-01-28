@@ -21,7 +21,7 @@ public class Vec3d extends VecNd<Vec3d> {
     }
 
     public Vec3d(Vec3d vec) {
-        super(vec);
+        this(vec.x, vec.y, vec.z);
     }
 
     /*public Vec3d(Vec3f vec) {

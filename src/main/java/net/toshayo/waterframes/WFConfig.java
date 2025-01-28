@@ -8,8 +8,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class WFConfig {
+    private static final Pattern HOSTS_PATTERN = Pattern.compile("^(?!-)([a-zA-Z0-9-]{1,63}\\.)+[a-zA-Z]{2,63}$");
+
     private static Configuration config;
 
     private static final String[] WHITELIST = new String[]{
@@ -23,6 +26,7 @@ public class WFConfig {
             "staticflickr.com",
             "flic.kr",
             "tenor.co",
+            "tenor.com",
             "gfycat.com",
             "giphy.com",
             "gph.is",
@@ -30,9 +34,6 @@ public class WFConfig {
             "i.redd.it",
             "media.tumblr.com",
             "twimg.com",
-            "discordapp.com",
-            "images.discordapp.net",
-            "discord.com",
             "githubusercontent.com",
             "googleusercontent.com",
             "googleapis.com",
@@ -42,11 +43,16 @@ public class WFConfig {
             "youtu.be",
             "twitch.tv",
             "twitter.com",
+            "x.com",
             "soundcloud.com",
             "kick.com",
+            "streamable.com",
             "srrapero720.me",
             "fbcdn.net",
             "drive.google.com",
+            "discordapp.com",
+            "images.discordapp.net",
+            "discord.com",
     };
 
     // RENDERING
@@ -58,6 +64,7 @@ public class WFConfig {
     private static int maxVolumeDistance = 64;
     private static int maxVolume = 100;
     private static boolean useMultimedia = true;
+    private static boolean useSlavismMode;
     private static boolean keepRendering = true;
     // BEHAVIOR
     private static boolean useLightsOnPlay = true;
@@ -76,6 +83,7 @@ public class WFConfig {
     // OVERRIDES (client)
     private static boolean overrideServerConfig = false;
     private static boolean clientUseMultimedia = false;
+    private static boolean clientSlavistMode;
     private static boolean clientKeepsRendering = false;
 
 
@@ -103,7 +111,8 @@ public class WFConfig {
             maxVolume = config.getInt("maxVolume", "multimedia", 100, 10, 120, "Max volume value. Values over 100 uses VLC überVolume");
 
             // multimedia/watermedia
-            useMultimedia = config.getBoolean("useMultimedia", "multimedia.watermedia", true, "Enables VLC/FFMPEG usage for multimedia processing like videos and music (support added by WATERMeDIA)");
+            useMultimedia = config.getBoolean("useMultimedia", "multimedia", true, "Enables VLC/FFMPEG usage for multimedia processing like videos and music (support added by WATERMeDIA)");
+            useSlavismMode = config.getBoolean("useSlavismMode", "multimedia", true, "Enables VLC/FFMPEG usage for multimedia processing like videos and music (support added by WATERMeDIA)");
 
             // block_behavior
             config.addCustomCategoryComment("block_behavior", "Configuration related to interactions with vanilla and modded features");
@@ -134,6 +143,7 @@ public class WFConfig {
             config.addCustomCategoryComment("client", "Configurations to override server config");
             overrideServerConfig = config.getBoolean("enable", "client", false, "Enables the option");
             clientUseMultimedia = config.getBoolean("useMultimedia", "client", false, "Overrides 'waterframes.watermedia.enable' option\nEnables VLC/FFMPEG usage for multimedia processing (support added by WATERMeDIA)");
+            clientSlavistMode = config.getBoolean("clientSlavistMode", "client", false, "Overrides 'waterframes.multimedia.slavistMode' option\nForce-enable WATERMeDIA's slavist mode, slavism enhances youtube quality at the cost of have unstable playback");
             clientKeepsRendering = config.getBoolean("keepRendering", "client", false, "Overrides 'waterframes.rendering.keepRendering'\nEnables media processing and rendering, disabling it will not render nothing, you can still hear videos");
 
         } catch (Exception e) {
@@ -203,6 +213,10 @@ public class WFConfig {
 
     public static boolean useMultimedia() {
         return overrideServerConfig ? clientUseMultimedia : useMultimedia;
+    }
+
+    public static boolean useSlavismMode() {
+        return overrideServerConfig ? clientSlavistMode : useSlavismMode;
     }
 
     // BEHAVIOR

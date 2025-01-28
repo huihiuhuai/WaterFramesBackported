@@ -106,7 +106,7 @@ public class ClientProxy extends CommonProxy {
         if (tile == null) {
             return;
         }
-        if (tile.display != null) { // COPYPASTED TODO: this is redundant, but i have no time to debug this
+        if (tile.display != null) { // COPYPASTED from WATERFrAMES TODO: this is redundant, but i have no time to debug this
             tile.display.setPauseMode(message.paused);
         }
     }

@@ -33,12 +33,16 @@ public class TextureDisplay {
     private boolean synced = false;
     private boolean released = false;
 
+    // SEEK CONTROL (WHEN SLAVISM MODE IS ENABLED)
+    private long seekTime;
+    private long lastSeekingTime;
+
     public TextureDisplay(DisplayTileEntity tile) {
+        this.tile = tile;
         this.imageCache = tile.imageCache;
         this.xCoord = tile.xCoord;
         this.yCoord = tile.yCoord;
         this.zCoord = tile.zCoord;
-        this.tile = tile;
         if (this.imageCache.isVideo()) {
             this.switchVideoMode();
         }
@@ -122,7 +126,7 @@ public class TextureDisplay {
                                 tile.data.loop
                         ) : this.mediaPlayer.texture();
             case AUDIO:
-                return -1;
+                return 0;
             default:
                 throw new IllegalArgumentException();
         }
@@ -212,6 +216,10 @@ public class TextureDisplay {
                 z += (int) (Facing.offsetsZForSide[tile.getBlockMetadata()] * this.tile.data.audioOffset);
                 int volume = limitVolume(x, y, z, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
+                if(!seeking() && seekTime != 0) {
+                    seekTo(seekTime);
+                }
+
                 if (currentVolume != volume) {
                     mediaPlayer.setVolume(currentVolume = volume);
                 }
@@ -240,7 +248,7 @@ public class TextureDisplay {
 
                         if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
                             currentLastTime.set(time);
-                            mediaPlayer.seekTo(time);
+                            seekTo(time);
                         }
                     }
                 }
@@ -253,20 +261,76 @@ public class TextureDisplay {
         }
     }
 
+    private void seekTo(long time) {
+        if (WFConfig.useSlavismMode() && this.seeking()) {
+            this.seekTime = time;
+        } else {
+            this.mediaPlayer.seekTo(time);
+            this.lastSeekingTime = System.currentTimeMillis();
+            this.seekTime = 0;
+        }
+    }
+
+    public boolean seeking() {
+        return this.lastSeekingTime + 10000 > System.currentTimeMillis();
+    }
+
+    public boolean isReady() {
+        if (this.imageCache.getStatus() != ImageCache.Status.READY) {
+            return false;
+        }
+        switch (displayMode) {
+            case PICTURE:
+                return true;
+            case VIDEO:
+            case AUDIO:
+                return this.imageCache.getStatus() == ImageCache.Status.READY && this.mediaPlayer.isReady();
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public boolean isBuffering() {
         switch (displayMode) {
             case PICTURE:
                 return false;
             case VIDEO:
             case AUDIO:
-                return mediaPlayer.isBuffering() || mediaPlayer.isLoading() || mediaPlayer.raw().mediaPlayer().status().state() == State.OPENING;
+                return mediaPlayer.isBuffering() || mediaPlayer.isLoading() || mediaPlayer.raw().mediaPlayer().status().state() == State.NOTHING_SPECIAL;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    public boolean isNotVideo() {
+        if (this.imageCache.getStatus() == ImageCache.Status.FAILED)
+            return true;
+
+        switch (displayMode) {
+            case PICTURE:
+                return false;
+            case VIDEO:
+            case AUDIO:
+                return this.mediaPlayer.isBroken();
             default:
                 throw new IllegalArgumentException();
         }
     }
 
     public boolean isLoading() {
-        return imageCache.getStatus() == ImageCache.Status.LOADING;
+        if(imageCache.getStatus() == ImageCache.Status.LOADING) {
+            return true;
+        }
+
+        switch (displayMode) {
+            case PICTURE:
+                return false;
+            case VIDEO:
+            case AUDIO:
+                return this.mediaPlayer.isLoading();
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public boolean isReleased() {
@@ -279,7 +343,7 @@ public class TextureDisplay {
                 break;
             case VIDEO:
             case AUDIO:
-                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
+                seekTo(MathAPI.tickToMs(this.tile.data.tick));
                 mediaPlayer.setPauseMode(pause);
                 mediaPlayer.setMuteMode(this.tile.data.muted);
                 break;
@@ -303,15 +367,9 @@ public class TextureDisplay {
         }
         this.released = true;
         imageCache.deuse();
-        switch (displayMode) {
-            case PICTURE:
-                if (imageCache != null) imageCache.deuse();
-                break;
-            case VIDEO:
-            case AUDIO:
-                mediaPlayer.release();
-                DisplayControl.remove(this);
-                break;
+        if (displayMode == Mode.VIDEO || displayMode == Mode.AUDIO) {
+            mediaPlayer.release();
+            DisplayControl.remove(this);
         }
     }
 

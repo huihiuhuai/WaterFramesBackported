@@ -12,10 +12,6 @@ public class Vec2f extends VecNf<Vec2f> {
         this.y = y;
     }
 
-    public Vec2f(Vec2f vec) {
-        super(vec);
-    }
-
     public void set(Vec2f vec) {
         this.x = vec.x;
         this.y = vec.y;
