@@ -6,7 +6,7 @@ A rewrite for forge 1.7.10 of a nice mod WATERFrAMES (source at: [https://github
 
 - [WATERMeDIA](https://www.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
 
-    Take version 2.1.8, and it does not matter that the mod is for 1.21.1
+    Take latest version, and it does not matter that the mod is for 1.21.1
 - JNA
 
     You will need jna and jna-platform libraries (5.10.0 for example). If you have a recent minecraft installation
