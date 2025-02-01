@@ -35,7 +35,8 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent event) throws Exception {
         super.preInit(event);
 
-        final Version minVersion = new Version("2.1.8");
+        WaterFramesMod.LOGGER.info("Using WATERMeDIA version {}", WaterMedia.VERSION);
+        final Version minVersion = new Version("2.1.16");
         if(!new Version(WaterMedia.VERSION).atLeast(minVersion)) {
             throw new RuntimeException("WaterMedia " + WaterMedia.VERSION + " is too old, please update the mod");
         }
