@@ -36,11 +36,11 @@ public class PluginUtils {
         return OS.startsWith("linux") && !"dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
     }
 
-    public static ByteBuffer MemoryAlloc_create(int pSize) {
+    public static ByteBuffer MemoryAlloc_createByteBuffer(int pSize) {
         return BufferUtils.createByteBuffer(pSize);
     }
 
-    public static ByteBuffer MemoryAlloc_resize(ByteBuffer pBuffer, int pByteSize) {
+    public static ByteBuffer MemoryAlloc_resizeByteBuffer(ByteBuffer pBuffer, int pByteSize) {
         if (pBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
         }
@@ -53,7 +53,7 @@ public class PluginUtils {
         return newBuffer;
     }
 
-    public static void MemoryAlloc_free(ByteBuffer pBuffer) {
+    public static void MemoryAlloc_freeByteBuffer(ByteBuffer pBuffer) {
         pBuffer = null;
     }
 
